@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Food Waste Emission Predictor</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg       : #f5f7f2;
+    --white    : #ffffff;
+    --border   : #e0e8dc;
+    --green    : #3b6d11;
+    --green-lt : #eaf3de;
+    --green-md : #639922;
+    --amber    : #ba7517;
+    --amber-lt : #faeeda;
+    --red      : #a32d2d;
+    --red-lt   : #fcebeb;
+    --text     : #1a2e1a;
+    --muted    : #5f7a5f;
+    --font     : 'DM Sans', sans-serif;
+    --display  : 'Syne', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  header {
+    margin-bottom: 40px;
+    animation: fadeDown 0.7s ease both;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--green-lt);
+    border: 1px solid #c0dd97;
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+
+  h1 span { color: var(--green-md); }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  /* Stats */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+    animation: fadeUp 0.7s 0.1s ease both;
+  }
+
+  .stat {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .stat-val {
+    font-family: var(--display);
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--green);
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 3px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Card */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
+    animation: fadeUp 0.7s 0.2s ease both;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--green-lt);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .card-title {
+    font-family: var(--display);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .card-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  .section-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .section-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+  .field:last-child { margin-bottom: 0; }
+
+  label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+
+  input, select {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 14px;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--green-md);
+    box-shadow: 0 0 0 3px rgba(99,153,34,0.12);
+  }
+
+  input::placeholder { color: #bfc9bf; }
+
+  select option { background: var(--white); }
+
+  .extra-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 8px;
+  }
+
+  .extra-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  /* Button */
+  .btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--green);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-family: var(--display);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    margin-top: 20px;
+  }
+
+  .btn:hover { background: #27500a; transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn.loading { opacity: 0.65; pointer-events: none; }
+
+  /* Result */
+  .result {
+    display: none;
+    background: var(--white);
+    border: 1.5px solid #c0dd97;
+    border-radius: 16px;
+    padding: 28px;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .result.show { display: block; }
+
+  .result-header {
+    font-family: var(--display);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--green);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .result-box {
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .result-box.waste { background: var(--green-lt); border: 1px solid #c0dd97; }
+  .result-box.co2   { background: var(--amber-lt); border: 1px solid #fac775; }
+
+  .result-val {
+    font-family: var(--display);
+    font-size: 2.4rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .result-box.waste .result-val { color: var(--green); }
+  .result-box.co2   .result-val { color: var(--amber); }
+
+  .result-unit {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  /* Level bar */
+  .level-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+  }
+
+  .level-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .level-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .level-badge {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  .level-badge.low    { background: var(--green-lt); color: var(--green); }
+  .level-badge.medium { background: var(--amber-lt); color: var(--amber); }
+  .level-badge.high   { background: var(--red-lt);   color: var(--red);   }
+
+  .bar-track {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s cubic-bezier(.4,0,.2,1);
+  }
+
+  .bar-fill.low    { background: var(--green-md); }
+  .bar-fill.medium { background: var(--amber); }
+  .bar-fill.high   { background: var(--red); }
+
+  .bar-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 5px;
+  }
+
+  /* Error */
+  .error {
+    display: none;
+    background: var(--red-lt);
+    border: 1px solid #f7c1c1;
+    border-radius: 10px;
+    padding: 14px 18px;
+    color: var(--red);
+    font-size: 13px;
+    margin-top: 14px;
+  }
+
+  .error.show { display: block; }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    margin-top: 48px;
+    color: var(--muted);
+    font-size: 12px;
+    animation: fadeUp 0.7s 0.4s ease both;
+  }
+
+  footer strong { color: var(--green); font-weight: 600; }
+
+  @media (max-width: 580px) {
+    .stats       { grid-template-columns: 1fr 1fr; }
+    .section-row { grid-template-columns: 1fr; }
+    .extra-row   { grid-template-columns: 1fr; }
+    .result-grid { grid-template-columns: 1fr; }
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="badge">🌱 ML-Powered · XGBoost Regressor</div>
+    <h1>Food Waste<br><span>Emission Predictor</span></h1>
+    <p class="subtitle">Predict food waste patterns and CO₂ emissions across countries and regions</p>
+  </header>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-val">0.9457</div>
+      <div class="stat-label">R² Score</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">2.55 kg</div>
+      <div class="stat-label">Avg Error (MAE)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">214</div>
+      <div class="stat-label">Countries</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">XGBoost</div>
+      <div class="stat-label">Algorithm</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">📊</div>
+      <div>
+        <div class="card-title">Enter Food Waste Data</div>
+        <div class="card-desc">Fill in waste estimates per sector to generate a prediction</div>
+      </div>
+    </div>
+
+    <div class="section-row">
+      <!-- Household -->
+      <div class="section-block">
+        <div class="section-title">🏠 Household</div>
+        <div class="field">
+          <label>kg per capita / year</label>
+          <input type="number" id="household_kg" placeholder="e.g. 82" min="0" step="0.1">
+        </div>
+        <div class="field">
+          <label>Total tonnes / year</label>
+          <input type="number" id="household_t" placeholder="e.g. 3109153" min="0">
+        </div>
+      </div>
+
+      <!-- Retail -->
+      <div class="section-block">
+        <div class="section-title">🛒 Retail</div>
+        <div class="field">
+          <label>kg per capita / year</label>
+          <input type="number" id="retail_kg" placeholder="e.g. 16" min="0" step="0.1">
+        </div>
+        <div class="field">
+          <label>Total tonnes / year</label>
+          <input type="number" id="retail_t" placeholder="e.g. 594982" min="0">
+        </div>
+      </div>
+    </div>
+
+    <!-- Food Service -->
+    <div class="section-block" style="margin-bottom: 16px;">
+      <div class="section-title">🍽️ Food Service</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+        <div class="field">
+          <label>kg per capita / year</label>
+          <input type="number" id="foodservice_kg" placeholder="e.g. 28" min="0" step="0.1">
+        </div>
+        <div class="field">
+          <label>Total tonnes / year</label>
+          <input type="number" id="foodservice_t" placeholder="e.g. 1051783" min="0">
+        </div>
+      </div>
+    </div>
+
+    <!-- Confidence + Region -->
+    <div class="extra-row">
+      <div class="extra-block">
+        <div class="section-title">📋 Data Confidence</div>
+        <div class="field">
+          <select id="confidence">
+            <option value="0">High Confidence</option>
+            <option value="1">Low Confidence</option>
+            <option value="2">Medium Confidence</option>
+            <option value="3" selected>Very Low Confidence</option>
+          </select>
+        </div>
+      </div>
+      <div class="extra-block">
+        <div class="section-title">🌍 Region</div>
+        <div class="field">
+          <select id="region">
+            <option value="0">Australia & New Zealand</option>
+            <option value="1">Caribbean</option>
+            <option value="2">Central America</option>
+            <option value="3">Central Asia</option>
+            <option value="4">Eastern Asia</option>
+            <option value="5">Eastern Europe</option>
+            <option value="6">Melanesia</option>
+            <option value="7">Northern Africa</option>
+            <option value="8">Northern America</option>
+            <option value="9">Northern Europe</option>
+            <option value="10">Polynesia</option>
+            <option value="11">South America</option>
+            <option value="12">Southern Asia</option>
+            <option value="13">Southern Europe</option>
+            <option value="14">Sub-Saharan Africa</option>
+            <option value="15">Western Asia</option>
+            <option value="16">Western Europe</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn" onclick="predict()" id="btn">
+      ⚡ Generate Prediction
+    </button>
+  </div>
+
+  <div class="error" id="error"></div>
+
+  <div class="result" id="result">
+    <div class="result-header">✅ Prediction Results</div>
+
+    <div class="result-grid">
+      <div class="result-box waste">
+        <div class="result-val" id="waste-val">—</div>
+        <div class="result-unit">kg / capita / year<br>Predicted Food Waste</div>
+      </div>
+      <div class="result-box co2">
+        <div class="result-val" id="co2-val">—</div>
+        <div class="result-unit">kg CO₂e / capita<br>Estimated Emissions</div>
+      </div>
+    </div>
+
+    <div class="level-card">
+      <div class="level-top">
+        <div class="level-title">Emission Level</div>
+        <div class="level-badge" id="level-badge">—</div>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" id="bar-fill" style="width:0%"></div>
+      </div>
+      <div class="bar-labels">
+        <span>Low</span>
+        <span>Medium</span>
+        <span>High</span>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Built with <strong>XGBoost + FastAPI + Python</strong> ·
+    Dataset: <strong>UNEP Food Waste Index (214 countries)</strong>
+  </footer>
+
+</div>
+
+<script>
+  async function predict() {
+    const btn    = document.getElementById('btn');
+    const result = document.getElementById('result');
+    const error  = document.getElementById('error');
+
+    const household_kg   = parseFloat(document.getElementById('household_kg').value);
+    const household_t    = parseFloat(document.getElementById('household_t').value);
+    const retail_kg      = parseFloat(document.getElementById('retail_kg').value);
+    const retail_t       = parseFloat(document.getElementById('retail_t').value);
+    const foodservice_kg = parseFloat(document.getElementById('foodservice_kg').value);
+    const foodservice_t  = parseFloat(document.getElementById('foodservice_t').value);
+    const confidence     = parseInt(document.getElementById('confidence').value);
+    const region         = parseInt(document.getElementById('region').value);
+
+    if ([household_kg, household_t, retail_kg, retail_t,
+         foodservice_kg, foodservice_t].some(isNaN)) {
+      error.textContent = '⚠️ Please fill in all numeric fields before predicting.';
+      error.classList.add('show');
+      result.classList.remove('show');
+      return;
+    }
+
+    error.classList.remove('show');
+    btn.textContent = '⏳ Predicting...';
+    btn.classList.add('loading');
+
+    try {
+      const response = await fetch('http://localhost:8000/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          household_kg_per_capita   : household_kg,
+          household_tonnes          : household_t,
+          retail_kg_per_capita      : retail_kg,
+          retail_tonnes             : retail_t,
+          foodservice_kg_per_capita : foodservice_kg,
+          foodservice_tonnes        : foodservice_t,
+          confidence_encoded        : confidence,
+          region_encoded            : region
+        })
+      });
+
+      const data = await response.json();
+
+      document.getElementById('waste-val').textContent = data.predicted_waste_kg_per_capita;
+      document.getElementById('co2-val').textContent   = data.co2_estimate_kg_per_capita;
+
+      const pct    = Math.min((data.co2_estimate_kg_per_capita / 600) * 100, 100);
+      const fill   = document.getElementById('bar-fill');
+      const badge  = document.getElementById('level-badge');
+
+      fill.style.width = pct + '%';
+
+      if (pct < 33) {
+        fill.className  = 'bar-fill low';
+        badge.className = 'level-badge low';
+        badge.textContent = '🟢 Low Emissions';
+      } else if (pct < 66) {
+        fill.className  = 'bar-fill medium';
+        badge.className = 'level-badge medium';
+        badge.textContent = '🟡 Medium Emissions';
+      } else {
+        fill.className  = 'bar-fill high';
+        badge.className = 'level-badge high';
+        badge.textContent = '🔴 High Emissions';
+      }
+
+      result.classList.add('show');
+
+    } catch (err) {
+      error.textContent = '⚠️ Could not connect to FastAPI server. Run: uvicorn app:app --reload';
+      error.classList.add('show');
+    }
+
+    btn.textContent = '⚡ Generate Prediction';
+    btn.classList.remove('loading');
+  }
+</script>
+</body>
+</html>
