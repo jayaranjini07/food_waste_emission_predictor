@@ -9,7 +9,7 @@
 ![R2](https://img.shields.io/badge/R²_Score-0.9457-blue)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
-🔗 **Live Demo:** [your-app-link-here.onrender.com](#) ← add after hosting
+🔗 **Live Demo:** 
 
 ---
 
@@ -62,25 +62,6 @@ The model also estimates CO₂ equivalent emissions by sector
 | Frontend | HTML, CSS, JavaScript |
 | Dataset | UNEP Food Waste Index (214 countries) |
 
----
-
-## 📁 Project Structure
-
-food_waste_emission_predictor/
-├── data/
-│   ├── raw/               ← original UNEP dataset
-│   └── processed/         ← cleaned data, plots, train/test splits
-├── notebooks/
-│   ├── 01_EDA.ipynb           ← exploratory data analysis
-│   ├── 02_preprocessing.ipynb ← feature engineering & encoding
-│   ├── 03_modeling.ipynb      ← model training & comparison
-│   └── 04_tuning.ipynb        ← hyperparameter tuning & SHAP
-├── src/                   ← modular Python scripts
-├── models/                ← saved .pkl model files
-├── static/
-│   └── index.html         ← web app frontend
-├── app.py                 ← FastAPI backend
-└── requirements.txt
 ---
 
 ## 🚀 Run Locally
@@ -142,7 +123,7 @@ behavior is the primary driver of total food waste.
 
 ## 🙋 Author
 
-**Jayaranjini** — Aspiring Data Scientist
+**Jayaranjini** 
 - GitHub: [@jayaranjini07](https://github.com/jayaranjini07)
 
 ---
